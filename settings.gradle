@@ -1,0 +1,2 @@
+rootProject.name='NFC Reader'
+include ':app'
