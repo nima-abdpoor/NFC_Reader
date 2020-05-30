@@ -17,6 +17,8 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         ResolveIntent(intent);
@@ -159,6 +161,15 @@ public class MainActivity extends AppCompatActivity {
         if (IsNFCEnable()) {
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         }
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(getIntent().getAction())) {
+            Log.i("MYTAG", "enter here also");
+            Tag tag = getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            Toast.makeText(getApplicationContext(), "asflksdfjTAG: " + tag.getId().toString(), Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+
+        }
         super.onResume();
     }
 
@@ -272,24 +283,24 @@ public class MainActivity extends AppCompatActivity {
         return sb.toString();
     }
 
-//    private long toDec(byte[] bytes) {
-//        long result = 0;
-//        long factor = 1;
-//        for (int i = 0; i < bytes.length; ++i) {
-//            long value = bytes[i] & 0xffl;
-//            result += value * factor;
-//            factor *= 256l;
-//        }
-//        return result;
-//    }
-
-    private String toDec(byte[] bytes) {
-        String result="" ;
-        for (byte b:bytes) {
-            result = result+(b & 0xff);
+    private long toDec(byte[] bytes) {
+        long result = 0;
+        long factor = 1;
+        for (int i = 0; i < bytes.length; ++i) {
+            long value = bytes[i] & 0xffl;
+            result += value * factor;
+            factor *= 256l;
         }
         return result;
     }
+//
+//    private String toDec(byte[] bytes) {
+//        String result="" ;
+//        for (byte b:bytes) {
+//            result = result+(b & 0xff);
+//        }
+//        return result;
+//    }
 
     private long toReversedDec(byte[] bytes) {
         long result = 0;
@@ -300,5 +311,18 @@ public class MainActivity extends AppCompatActivity {
             factor *= 256l;
         }
         return result;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("Write").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent=new Intent(MainActivity.this, SendNFC.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 }
